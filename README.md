@@ -11,7 +11,8 @@
 > An end-to-end Arabic question-answering system over the **اليوم السابع** news website.
 > Scrape → preprocess → embed → retrieve → extract → serve, all in five files of vanilla Python.
 
-> 📸 **Screenshot:** [_Add a screenshot of `index.html` in action here once deployed._]
+> <img width="1850" height="682" alt="image" src="https://github.com/user-attachments/assets/fc219cae-6349-48cb-873c-05d4f406406e" />
+
 
 ---
 
