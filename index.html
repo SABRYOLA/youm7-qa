@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Youm7 QA — نظام الإجابة على الأسئلة</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    /* ───────── Theme ───────── */
+    :root {
+      --primary:    #1a237e;
+      --secondary:  #283593;
+      --accent:     #00c853;
+      --accent-d:   #00a843;
+      --accent2:    #ff6f00;
+      --bg:         #f5f5f5;
+      --card-bg:    #ffffff;
+      --text:       #212121;
+      --text-light: #757575;
+      --border:     #e0e0e0;
+      --danger:     #d32f2f;
+      --warn:       #fbc02d;
+
+      --cat-economy:    #1565c0;
+      --cat-sports:     #2e7d32;
+      --cat-politics:   #6a1b9a;
+      --cat-tech:       #e65100;
+      --cat-health:     #c62828;
+      --cat-default:    #455a64;
+
+      --shadow: 0 2px 8px rgba(0,0,0,.06);
+      --shadow-md: 0 6px 20px rgba(0,0,0,.10);
+      --radius: 12px;
+    }
+
+    /* ───────── Reset / base ───────── */
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: 'Tajawal', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      direction: rtl;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+    a { color: var(--secondary); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    button { font-family: inherit; cursor: pointer; }
+
+    /* ───────── Header ───────── */
+    header {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      padding: 16px 28px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      box-shadow: var(--shadow-md);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .logo { font-size: 28px; }
+    .header-titles h1 {
+      margin: 0; font-size: 20px; font-weight: 700; line-height: 1.2;
+    }
+    .header-titles .sub {
+      margin: 0; font-size: 13px; opacity: .85; font-weight: 300;
+    }
+    .status {
+      margin-inline-start: auto;
+      display: flex; align-items: center; gap: 8px;
+      background: rgba(255,255,255,.12);
+      padding: 6px 14px;
+      border-radius: 100px;
+      font-size: 14px;
+    }
+    .status-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 0 0 rgba(0,200,83,.7);
+      animation: pulse 1.8s infinite;
+    }
+    .status.offline .status-dot {
+      background: var(--danger);
+      box-shadow: 0 0 0 0 rgba(211,47,47,.7);
+      animation: pulse-red 1.8s infinite;
+    }
+    @keyframes pulse {
+      0%   { box-shadow: 0 0 0 0 rgba(0,200,83,.6); }
+      70%  { box-shadow: 0 0 0 10px rgba(0,200,83,0); }
+      100% { box-shadow: 0 0 0 0 rgba(0,200,83,0); }
+    }
+    @keyframes pulse-red {
+      0%   { box-shadow: 0 0 0 0 rgba(211,47,47,.6); }
+      70%  { box-shadow: 0 0 0 10px rgba(211,47,47,0); }
+      100% { box-shadow: 0 0 0 0 rgba(211,47,47,0); }
+    }
+
+    /* ───────── Layout ───────── */
+    .layout {
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      gap: 24px;
+      max-width: 1400px;
+      margin: 24px auto;
+      padding: 0 24px;
+    }
+    @media (max-width: 900px) {
+      .layout { grid-template-columns: 1fr; padding: 0 12px; gap: 16px; }
+    }
+
+    /* ───────── Sidebar ───────── */
+    aside {
+      display: flex; flex-direction: column; gap: 16px;
+    }
+    .panel {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+      box-shadow: var(--shadow);
+    }
+    .panel h3 {
+      margin: 0 0 12px;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--primary);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .panel p {
+      margin: 0;
+      color: var(--text-light);
+      font-size: 14px;
+    }
+    .pipeline { list-style: none; padding: 0; margin: 0; }
+    .pipeline li {
+      display: flex; gap: 10px; align-items: flex-start;
+      padding: 8px 0;
+      font-size: 13.5px;
+      color: var(--text);
+    }
+    .pipeline li .step-icon {
+      flex: 0 0 auto;
+      width: 28px; height: 28px;
+      background: rgba(26,35,126,.08);
+      border-radius: 8px;
+      display: grid; place-items: center;
+      font-size: 14px;
+    }
+    .sample-list { display: flex; flex-direction: column; gap: 8px; }
+    .sample-btn {
+      background: var(--bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 9px 12px;
+      font-size: 13.5px;
+      text-align: right;
+      transition: all .15s;
+    }
+    .sample-btn:hover {
+      background: white;
+      border-color: var(--accent);
+      color: var(--primary);
+      transform: translateX(-2px);
+    }
+    .stat-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .stat {
+      background: var(--bg);
+      border-radius: 10px;
+      padding: 10px 12px;
+      text-align: center;
+    }
+    .stat .num {
+      font-size: 20px; font-weight: 700; color: var(--primary);
+      display: block; line-height: 1.1;
+    }
+    .stat .lab {
+      font-size: 11.5px; color: var(--text-light);
+    }
+    .stat.full { grid-column: 1 / -1; }
+
+    /* ───────── Main ───────── */
+    main {
+      display: flex; flex-direction: column; gap: 20px;
+      min-width: 0;
+    }
+    .tabs {
+      display: flex;
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 6px;
+      box-shadow: var(--shadow);
+      gap: 4px;
+    }
+    .tab-btn {
+      flex: 1;
+      background: transparent;
+      border: none;
+      border-radius: 10px;
+      padding: 12px;
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--text-light);
+      transition: all .2s;
+    }
+    .tab-btn.active {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      box-shadow: 0 4px 12px rgba(26,35,126,.25);
+    }
+
+    .tab-panel { display: none; animation: fadeIn .25s ease; }
+    .tab-panel.active { display: block; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .input-card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 22px;
+      box-shadow: var(--shadow);
+    }
+    textarea, input[type="text"] {
+      font-family: inherit;
+      width: 100%;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      padding: 14px;
+      font-size: 16px;
+      color: var(--text);
+      background: white;
+      direction: rtl;
+      text-align: right;
+      transition: border-color .15s, box-shadow .15s;
+      resize: vertical;
+    }
+    textarea { min-height: 90px; }
+    textarea:focus, input[type="text"]:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(0,200,83,.15);
+    }
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-top: 14px;
+      flex-wrap: wrap;
+    }
+    .slider-group {
+      display: flex; align-items: center; gap: 10px;
+      flex: 1; min-width: 200px;
+    }
+    .slider-group label {
+      font-size: 14px; color: var(--text-light);
+      white-space: nowrap;
+    }
+    .slider-group input[type=range] {
+      flex: 1;
+      accent-color: var(--accent);
+    }
+    .slider-group .value {
+      min-width: 24px; text-align: center;
+      font-weight: 700; color: var(--primary);
+    }
+    .submit-btn {
+      background: linear-gradient(135deg, var(--accent), var(--accent-d));
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 13px 26px;
+      font-size: 15px;
+      font-weight: 700;
+      box-shadow: 0 4px 12px rgba(0,200,83,.3);
+      transition: transform .1s, box-shadow .15s;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .submit-btn:hover  { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(0,200,83,.4); }
+    .submit-btn:active { transform: translateY(0); }
+    .submit-btn:disabled {
+      opacity: .65; cursor: not-allowed; transform: none;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 28px;
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      color: var(--text-light);
+      font-size: 15px;
+      animation: fadeIn .2s ease;
+    }
+    .loading .spinner {
+      display: inline-block;
+      width: 32px; height: 32px;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin .8s linear infinite;
+      margin-bottom: 10px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .error-box {
+      background: #fff3f0;
+      color: var(--danger);
+      border: 1px solid #ffccc4;
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      animation: fadeIn .25s ease;
+    }
+
+    /* ───────── Answer card ───────── */
+    .answer-card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 24px;
+      box-shadow: var(--shadow-md);
+      animation: fadeIn .3s ease;
+      border-top: 4px solid var(--accent);
+    }
+    .answer-card.medium { border-top-color: var(--warn); }
+    .answer-card.low    { border-top-color: var(--danger); }
+    .answer-card.none   { border-top-color: var(--text-light); }
+
+    .answer-head {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 14px; color: var(--text-light);
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+    .answer-text {
+      font-size: 18px;
+      font-weight: 500;
+      color: var(--text);
+      line-height: 1.9;
+      margin: 0 0 18px;
+    }
+    .divider {
+      height: 1px; background: var(--border);
+      margin: 14px 0;
+    }
+    .conf-row {
+      display: flex; align-items: center; gap: 12px;
+      flex-wrap: wrap;
+    }
+    .conf-bar {
+      flex: 1; min-width: 180px;
+      height: 10px;
+      background: #eceff1;
+      border-radius: 100px;
+      overflow: hidden;
+      position: relative;
+    }
+    .conf-fill {
+      height: 100%;
+      border-radius: 100px;
+      transition: width .5s cubic-bezier(.4,0,.2,1);
+    }
+    .conf-fill.high   { background: linear-gradient(90deg, #00c853, #00e676); }
+    .conf-fill.medium { background: linear-gradient(90deg, #fbc02d, #ffd54f); }
+    .conf-fill.low    { background: linear-gradient(90deg, #d32f2f, #ef5350); }
+    .conf-label {
+      font-weight: 700; font-size: 14px;
+      white-space: nowrap;
+    }
+    .conf-label.high   { color: var(--accent); }
+    .conf-label.medium { color: #f57f17; }
+    .conf-label.low    { color: var(--danger); }
+
+    .meta-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px 18px;
+      font-size: 14px;
+      margin-top: 10px;
+    }
+    @media (max-width: 600px) {
+      .meta-row { grid-template-columns: 1fr; }
+    }
+    .meta-row .meta-item {
+      display: flex; align-items: flex-start; gap: 6px;
+      color: var(--text);
+      min-width: 0;
+    }
+    .meta-row .meta-item span:last-child { word-break: break-word; }
+    .meta-row .meta-item.link { color: var(--secondary); }
+
+    /* ───────── Category badge ───────── */
+    .cat-badge {
+      display: inline-block;
+      padding: 3px 12px;
+      font-size: 12.5px;
+      font-weight: 500;
+      color: white;
+      background: var(--cat-default);
+      border-radius: 100px;
+      white-space: nowrap;
+    }
+    .cat-badge.cat-اقتصاد    { background: var(--cat-economy); }
+    .cat-badge.cat-رياضة    { background: var(--cat-sports); }
+    .cat-badge.cat-سياسة    { background: var(--cat-politics); }
+    .cat-badge.cat-تكنولوجيا { background: var(--cat-tech); }
+    .cat-badge.cat-صحة      { background: var(--cat-health); }
+
+    /* ───────── Related sources ───────── */
+    .related-section { margin-top: 4px; }
+    .related-section h3 {
+      margin: 0 0 12px;
+      font-size: 16px;
+      color: var(--primary);
+    }
+    .related-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+    }
+    .related-card {
+      background: var(--card-bg);
+      border-radius: 10px;
+      padding: 14px;
+      box-shadow: var(--shadow);
+      transition: transform .15s, box-shadow .15s;
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .related-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+    .related-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.5;
+      margin: 0;
+    }
+    .score-pill {
+      display: inline-block;
+      background: rgba(0,200,83,.12);
+      color: var(--accent-d);
+      padding: 2px 10px;
+      border-radius: 100px;
+      font-size: 12px;
+      font-weight: 700;
+      width: fit-content;
+    }
+    .related-link {
+      font-size: 13px;
+      color: var(--secondary);
+      margin-top: auto;
+    }
+
+    /* ───────── Search results ───────── */
+    .search-list { display: flex; flex-direction: column; gap: 10px; }
+    .result-card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 16px 18px;
+      box-shadow: var(--shadow);
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      animation: fadeIn .25s ease;
+    }
+    .rank-badge {
+      flex: 0 0 auto;
+      width: 38px; height: 38px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      font-weight: 700;
+      display: grid; place-items: center;
+      font-size: 14px;
+    }
+    .result-body { flex: 1; min-width: 0; }
+    .result-title {
+      font-size: 15px;
+      font-weight: 700;
+      margin: 0 0 6px;
+      color: var(--text);
+    }
+    .result-meta {
+      display: flex; align-items: center; gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 8px;
+    }
+    .result-preview {
+      font-size: 13.5px;
+      color: var(--text-light);
+      line-height: 1.7;
+      margin: 0 0 8px;
+    }
+    .score-bar {
+      height: 5px; background: #eceff1;
+      border-radius: 100px; overflow: hidden;
+      width: 100%;
+      margin-bottom: 6px;
+    }
+    .score-bar > div {
+      height: 100%; border-radius: 100px;
+      background: linear-gradient(90deg, var(--secondary), var(--accent));
+    }
+
+    /* ───────── History ───────── */
+    .history-section .panel { padding: 20px 22px; }
+    .history-list { display: flex; flex-direction: column; gap: 8px; }
+    .history-item {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 14px;
+      display: flex; align-items: center; gap: 10px;
+      cursor: pointer;
+      transition: all .15s;
+      animation: slideIn .3s ease;
+    }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(20px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+    .history-item:hover {
+      background: white;
+      border-color: var(--accent);
+      transform: translateX(-3px);
+    }
+    .history-q {
+      flex: 1;
+      font-size: 14px;
+      color: var(--text);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .history-time { font-size: 12px; color: var(--text-light); white-space: nowrap; }
+
+    .conf-tag {
+      font-size: 11.5px;
+      padding: 2px 10px;
+      border-radius: 100px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .conf-tag.high   { background: rgba(0,200,83,.15); color: var(--accent-d); }
+    .conf-tag.medium { background: rgba(251,192,45,.18); color: #f57f17; }
+    .conf-tag.low    { background: rgba(211,47,47,.13); color: var(--danger); }
+    .conf-tag.none   { background: #eee; color: var(--text-light); }
+
+    .empty {
+      color: var(--text-light); font-size: 14px;
+      padding: 6px 4px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <span class="logo">📰</span>
+    <div class="header-titles">
+      <h1>Youm7 QA</h1>
+      <p class="sub">نظام الإجابة على الأسئلة</p>
+    </div>
+    <div class="status" id="status">
+      <span class="status-dot"></span>
+      <span id="statusLabel">جارٍ الاتصال...</span>
+    </div>
+  </header>
+
+  <div class="layout">
+
+    <!-- ───────── Sidebar ───────── -->
+    <aside>
+      <div class="panel">
+        <h3>ℹ️ عن النظام</h3>
+        <p>نظام إجابة عن الأسئلة بالعربية مبني على مقالات اليوم السابع. يستخدم نموذج تضمين متعدد اللغات وفهرس FAISS لاسترجاع الإجابات الأكثر صلة من 30 مقالة و 62 مقطع نصي.</p>
+      </div>
+
+      <div class="panel">
+        <h3>⚙️ كيف يعمل؟</h3>
+        <ul class="pipeline">
+          <li><span class="step-icon">🔍</span><span>يتم تحويل سؤالك إلى متجه رياضي</span></li>
+          <li><span class="step-icon">📊</span><span>يبحث النظام في 62 مقطع نصي</span></li>
+          <li><span class="step-icon">🎯</span><span>يستخرج الإجابة الأكثر صلة</span></li>
+          <li><span class="step-icon">📰</span><span>يعرض المصدر والمقالات المشابهة</span></li>
+        </ul>
+      </div>
+
+      <div class="panel">
+        <h3>💡 أسئلة مقترحة</h3>
+        <div class="sample-list" id="sampleList"></div>
+      </div>
+
+      <div class="panel">
+        <h3>📈 إحصائيات</h3>
+        <div class="stat-grid">
+          <div class="stat"><span class="num" id="statChunks">—</span><span class="lab">عدد المقاطع</span></div>
+          <div class="stat"><span class="num" id="statArticles">—</span><span class="lab">عدد المقالات</span></div>
+          <div class="stat full"><span class="num" id="statModel" style="font-size:14px">—</span><span class="lab">النموذج</span></div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ───────── Main ───────── -->
+    <main>
+      <div class="tabs" role="tablist">
+        <button class="tab-btn active" data-tab="ask" role="tab">💬 سؤال وجواب</button>
+        <button class="tab-btn" data-tab="search" role="tab">🔎 بحث متقدم</button>
+      </div>
+
+      <!-- QA TAB -->
+      <section class="tab-panel active" id="tab-ask">
+        <div class="input-card">
+          <textarea id="askInput" placeholder="اكتب سؤالك هنا... مثال: ما هو سعر الذهب؟"></textarea>
+          <div class="controls">
+            <div class="slider-group">
+              <label for="askTopK">عدد النتائج:</label>
+              <input type="range" id="askTopK" min="1" max="10" value="5" />
+              <span class="value" id="askTopKValue">5</span>
+            </div>
+            <button class="submit-btn" id="askBtn">🔍 ابحث عن الإجابة</button>
+          </div>
+        </div>
+        <div id="askOutput" style="margin-top:20px;"></div>
+      </section>
+
+      <!-- SEARCH TAB -->
+      <section class="tab-panel" id="tab-search">
+        <div class="input-card">
+          <input type="text" id="searchInput" placeholder="اكتب استعلامك هنا... مثال: الذهب في مصر" />
+          <div class="controls">
+            <div class="slider-group">
+              <label for="searchTopK">عدد النتائج:</label>
+              <input type="range" id="searchTopK" min="1" max="10" value="3" />
+              <span class="value" id="searchTopKValue">3</span>
+            </div>
+            <button class="submit-btn" id="searchBtn">🔎 بحث</button>
+          </div>
+        </div>
+        <div id="searchOutput" style="margin-top:20px;"></div>
+      </section>
+
+      <!-- HISTORY -->
+      <section class="history-section">
+        <div class="panel">
+          <h3>🕐 سجل الأسئلة</h3>
+          <div class="history-list" id="historyList">
+            <div class="empty">لم تطرح أي أسئلة بعد. جرّب أحد الأسئلة المقترحة.</div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    // ───────── Config ─────────
+    const API_BASE = 'http://localhost:8000';
+    const SAMPLE_QUESTIONS = [
+      'ما هو سعر الذهب في مصر اليوم؟',
+      'ما هي أسباب أمراض القلب؟',
+      'ما آخر أخبار الذكاء الاصطناعي؟',
+      'ما هي مواعيد مباريات الدوري؟',
+      'ما هي نصائح لتقوية العضلات؟',
+    ];
+    const HISTORY_KEY = 'youm7_qa_history';
+    const MAX_HISTORY = 5;
+
+    // ───────── Helpers ─────────
+    const $ = (sel) => document.querySelector(sel);
+    const escapeHTML = (s) =>
+      String(s ?? '')
+        .replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;')
+        .replaceAll('"','&quot;').replaceAll("'",'&#039;');
+
+    function confTier(label) {
+      if (label === 'عالية')  return 'high';
+      if (label === 'متوسطة') return 'medium';
+      if (label === 'منخفضة') return 'low';
+      return 'none';
+    }
+
+    function timeAgo(ts) {
+      const diff = Math.max(0, (Date.now() - ts) / 1000);
+      if (diff < 30)    return 'الآن';
+      if (diff < 90)    return 'منذ دقيقة';
+      if (diff < 3600)  return `منذ ${Math.floor(diff/60)} دقيقة`;
+      if (diff < 7200)  return 'منذ ساعة';
+      if (diff < 86400) return `منذ ${Math.floor(diff/3600)} ساعة`;
+      if (diff < 172800) return 'منذ يوم';
+      return `منذ ${Math.floor(diff/86400)} أيام`;
+    }
+
+    function truncate(s, n) {
+      s = (s || '').trim();
+      return s.length > n ? s.slice(0, n).trim() + '…' : s;
+    }
+
+    // ───────── Health / status ─────────
+    let healthy = false;
+    async function checkHealth() {
+      try {
+        const res = await fetch(`${API_BASE}/health`);
+        if (!res.ok) throw new Error('not ok');
+        const data = await res.json();
+        healthy = !!data.model_loaded && !!data.index_loaded;
+        $('#status').classList.remove('offline');
+        $('#statusLabel').textContent = 'متصل';
+        $('#statChunks').textContent = data.total_chunks ?? '—';
+        $('#statArticles').textContent = data.total_articles ?? '—';
+        $('#statModel').textContent = (data.model_name || '').replace('paraphrase-multilingual-', '') || '—';
+      } catch {
+        healthy = false;
+        $('#status').classList.add('offline');
+        $('#statusLabel').textContent = 'غير متصل';
+      }
+    }
+
+    // ───────── Sample questions ─────────
+    function renderSamples() {
+      const list = $('#sampleList');
+      list.innerHTML = '';
+      SAMPLE_QUESTIONS.forEach(q => {
+        const b = document.createElement('button');
+        b.className = 'sample-btn';
+        b.textContent = q;
+        b.addEventListener('click', () => {
+          activateTab('ask');
+          $('#askInput').value = q;
+          handleAsk();
+        });
+        list.appendChild(b);
+      });
+    }
+
+    // ───────── Tabs ─────────
+    function activateTab(name) {
+      document.querySelectorAll('.tab-btn').forEach(b =>
+        b.classList.toggle('active', b.dataset.tab === name));
+      document.querySelectorAll('.tab-panel').forEach(p =>
+        p.classList.toggle('active', p.id === 'tab-' + name));
+    }
+    document.querySelectorAll('.tab-btn').forEach(b =>
+      b.addEventListener('click', () => activateTab(b.dataset.tab)));
+
+    // ───────── Sliders ─────────
+    function bindSlider(sliderId, valueId) {
+      const s = $('#' + sliderId), v = $('#' + valueId);
+      s.addEventListener('input', () => v.textContent = s.value);
+    }
+    bindSlider('askTopK', 'askTopKValue');
+    bindSlider('searchTopK', 'searchTopKValue');
+
+    // ───────── Ask flow ─────────
+    function showLoading(host, msg) {
+      host.innerHTML = `<div class="loading"><div class="spinner"></div><div>${msg}</div></div>`;
+    }
+    function showError(host, msg) {
+      host.innerHTML = `<div class="error-box">${msg}</div>`;
+    }
+
+    function renderAnswer(data) {
+      const tier = confTier(data.confidence_label);
+      const pct = Math.round((data.confidence || 0) * 100);
+      const cat = escapeHTML(data.source_category || '');
+      const catBadge = cat
+        ? `<span class="cat-badge cat-${cat}">${cat}</span>`
+        : '';
+      const sourceLink = data.source_url
+        ? `<a href="${escapeHTML(data.source_url)}" target="_blank" rel="noopener">رابط المقال</a>`
+        : '<span style="color:var(--text-light)">—</span>';
+      const sourceTitle = data.source_title
+        ? escapeHTML(data.source_title)
+        : '<span style="color:var(--text-light)">—</span>';
+
+      let related = '';
+      if (Array.isArray(data.related_sources) && data.related_sources.length) {
+        const cards = data.related_sources.map(r => {
+          const rcat = escapeHTML(r.category || '');
+          const rcatBadge = rcat ? `<span class="cat-badge cat-${rcat}">${rcat}</span>` : '';
+          const rscore = ((r.score ?? 0)).toFixed(3);
+          return `
+            <div class="related-card">
+              <p class="related-title">${escapeHTML(r.title || '')}</p>
+              <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                ${rcatBadge}
+                <span class="score-pill">تشابه ${rscore}</span>
+              </div>
+              <a class="related-link" href="${escapeHTML(r.url || '#')}" target="_blank" rel="noopener">قراءة المقال →</a>
+            </div>`;
+        }).join('');
+        related = `
+          <div class="related-section">
+            <h3>📚 مصادر ذات صلة</h3>
+            <div class="related-grid">${cards}</div>
+          </div>`;
+      }
+
+      return `
+        <div class="answer-card ${tier}">
+          <div class="answer-head">🎯 الإجابة</div>
+          <p class="answer-text">${escapeHTML(data.answer || '—')}</p>
+          <div class="divider"></div>
+          <div class="conf-row">
+            <strong>الثقة:</strong>
+            <div class="conf-bar"><div class="conf-fill ${tier}" style="width:${pct}%"></div></div>
+            <span class="conf-label ${tier}">${escapeHTML(data.confidence_label || '—')} (${(data.confidence ?? 0).toFixed(2)})</span>
+          </div>
+          <div class="divider"></div>
+          <div class="meta-row">
+            <div class="meta-item"><span>📰</span><span><strong>المصدر:</strong> ${sourceTitle}</span></div>
+            <div class="meta-item link"><span>🔗</span><span>${sourceLink}</span></div>
+            <div class="meta-item"><span>🏷️</span><span><strong>التصنيف:</strong> ${catBadge || '<span style="color:var(--text-light)">—</span>'}</span></div>
+            <div class="meta-item"><span>⚡</span><span><strong>وقت المعالجة:</strong> ${data.processing_time_ms ?? '—'} ms</span></div>
+          </div>
+        </div>
+        ${related}
+      `;
+    }
+
+    async function handleAsk() {
+      const inputEl = $('#askInput');
+      const btn = $('#askBtn');
+      const host = $('#askOutput');
+      const q = (inputEl.value || '').trim();
+
+      if (!q) {
+        showError(host, '⚠️ السؤال لا يمكن أن يكون فارغاً.');
+        return;
+      }
+      if (q.length < 5) {
+        showError(host, '⚠️ السؤال قصير جداً (5 أحرف على الأقل).');
+        return;
+      }
+      if (q.length > 500) {
+        showError(host, '⚠️ السؤال طويل جداً (500 حرف كحد أقصى).');
+        return;
+      }
+
+      btn.disabled = true;
+      showLoading(host, '⏳ جارٍ البحث في المقالات...');
+
+      try {
+        const res = await fetch(`${API_BASE}/ask`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ question: q, top_k: Number($('#askTopK').value) }),
+        });
+        if (!res.ok) {
+          let err = 'خطأ غير متوقع';
+          try { const j = await res.json(); err = j.detail || err; } catch {}
+          showError(host, `⚠️ ${escapeHTML(err)}`);
+          return;
+        }
+        const data = await res.json();
+        host.innerHTML = renderAnswer(data);
+        addHistory({
+          question: q,
+          confidence_label: data.confidence_label,
+          confidence: data.confidence,
+          ts: Date.now(),
+        });
+      } catch (e) {
+        showError(host, '⚠️ تعذر الاتصال بالخادم. تأكد من تشغيل api.py');
+      } finally {
+        btn.disabled = false;
+      }
+    }
+    $('#askBtn').addEventListener('click', handleAsk);
+    $('#askInput').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) handleAsk();
+    });
+
+    // ───────── Search flow ─────────
+    function renderSearch(data) {
+      if (!data.results || !data.results.length) {
+        return `<div class="error-box">لا توجد نتائج لهذا الاستعلام.</div>`;
+      }
+      const items = data.results.map(r => {
+        const cat = escapeHTML(r.category || '');
+        const catBadge = cat ? `<span class="cat-badge cat-${cat}">${cat}</span>` : '';
+        const pct = Math.round((r.score || 0) * 100);
+        return `
+          <div class="result-card">
+            <div class="rank-badge">#${r.rank}</div>
+            <div class="result-body">
+              <h4 class="result-title">${escapeHTML(r.title || '')}</h4>
+              <div class="score-bar"><div style="width:${pct}%"></div></div>
+              <div class="result-meta">
+                ${catBadge}
+                <span class="score-pill">تشابه ${(r.score ?? 0).toFixed(3)} (${pct}%)</span>
+              </div>
+              <p class="result-preview">${escapeHTML(r.chunk_preview || '')}…</p>
+              <a href="${escapeHTML(r.url || '#')}" target="_blank" rel="noopener">قراءة المقال الأصلي →</a>
+            </div>
+          </div>`;
+      }).join('');
+      return `<div class="search-list">${items}</div>`;
+    }
+
+    async function handleSearch() {
+      const inputEl = $('#searchInput');
+      const btn = $('#searchBtn');
+      const host = $('#searchOutput');
+      const q = (inputEl.value || '').trim();
+
+      if (!q) {
+        showError(host, '⚠️ الاستعلام لا يمكن أن يكون فارغاً.');
+        return;
+      }
+
+      btn.disabled = true;
+      showLoading(host, '⏳ جارٍ البحث...');
+
+      try {
+        const res = await fetch(`${API_BASE}/search`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query: q, top_k: Number($('#searchTopK').value) }),
+        });
+        if (!res.ok) {
+          let err = 'خطأ غير متوقع';
+          try { const j = await res.json(); err = j.detail || err; } catch {}
+          showError(host, `⚠️ ${escapeHTML(err)}`);
+          return;
+        }
+        const data = await res.json();
+        host.innerHTML = renderSearch(data);
+      } catch {
+        showError(host, '⚠️ تعذر الاتصال بالخادم. تأكد من تشغيل api.py');
+      } finally {
+        btn.disabled = false;
+      }
+    }
+    $('#searchBtn').addEventListener('click', handleSearch);
+    $('#searchInput').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') handleSearch();
+    });
+
+    // ───────── History ─────────
+    function loadHistory() {
+      try { return JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); }
+      catch { return []; }
+    }
+    function saveHistory(h) {
+      localStorage.setItem(HISTORY_KEY, JSON.stringify(h.slice(0, MAX_HISTORY)));
+    }
+    function addHistory(entry) {
+      const h = loadHistory();
+      h.unshift(entry);
+      saveHistory(h);
+      renderHistory();
+    }
+    function renderHistory() {
+      const h = loadHistory();
+      const list = $('#historyList');
+      if (!h.length) {
+        list.innerHTML = `<div class="empty">لم تطرح أي أسئلة بعد. جرّب أحد الأسئلة المقترحة.</div>`;
+        return;
+      }
+      list.innerHTML = h.map((it, i) => {
+        const tier = confTier(it.confidence_label);
+        return `
+          <div class="history-item" data-idx="${i}">
+            <span class="conf-tag ${tier}">${escapeHTML(it.confidence_label || '—')}</span>
+            <span class="history-q" title="${escapeHTML(it.question)}">${escapeHTML(truncate(it.question, 60))}</span>
+            <span class="history-time">${timeAgo(it.ts)}</span>
+          </div>`;
+      }).join('');
+      list.querySelectorAll('.history-item').forEach(el => {
+        el.addEventListener('click', () => {
+          const idx = Number(el.dataset.idx);
+          const item = loadHistory()[idx];
+          if (!item) return;
+          activateTab('ask');
+          $('#askInput').value = item.question;
+          handleAsk();
+        });
+      });
+    }
+
+    // Refresh history timestamps every 30s.
+    setInterval(renderHistory, 30000);
+
+    // ───────── Init ─────────
+    renderSamples();
+    renderHistory();
+    checkHealth();
+    setInterval(checkHealth, 30000);
+  </script>
+</body>
+</html>

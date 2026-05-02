@@ -1,0 +1,29 @@
+# ════════════════════════════════════════════════════════════
+#  Youm7 QA — Final dependency manifest
+#  Python 3.10+ required
+#  Install with: pip install -r requirements.txt
+# ════════════════════════════════════════════════════════════
+
+# ─── Stage 1 — Scraping (Selenium + BeautifulSoup) ──────────
+requests==2.31.0
+beautifulsoup4==4.12.3
+lxml==5.2.2
+selenium==4.20.0
+webdriver-manager==4.0.1
+
+# ─── Stage 2 — Arabic Preprocessing ─────────────────────────
+pyarabic==0.6.15
+
+# ─── Stage 3 — Embedding & Indexing ─────────────────────────
+sentence-transformers==2.7.0
+faiss-cpu==1.8.0
+numpy==1.26.4
+
+# ─── Stage 4 — Answer Generation ────────────────────────────
+# (uses sentence-transformers, faiss-cpu, numpy, pyarabic above)
+# no additional runtime dependencies
+
+# ─── Stage 5 — API Deployment ───────────────────────────────
+fastapi==0.110.0
+uvicorn[standard]==0.29.0
+pydantic==2.7.0
